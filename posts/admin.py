@@ -1,7 +1,7 @@
-# posts/admin.py
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import Category, Tag, Post
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -9,29 +9,74 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
 
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
 
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'category', 'is_published', 'created_at', 'featured_image_tag']
-    list_filter = ['is_published', 'category', 'tags', 'created_at']
-    search_fields = ['title', 'content', 'author__username']
+    list_display = [
+        'title',
+        'author',
+        'category',
+        'status',
+        'is_published',
+        'created_at'
+    ]
+    list_filter = ['status', 'is_published', 'category', 'created_at']
+    search_fields = ['title', 'excerpt', 'author__username']
     prepopulated_fields = {'slug': ('title',)}
     autocomplete_fields = ['tags']
-    readonly_fields = ['featured_image_tag']  # Đổi thành tên hàm mới
+    readonly_fields = ['html_preview', 'created_at', 'updated_at']
 
     fieldsets = (
-    (None, {
-        'fields': ('title', 'slug', 'author', 'content', 'excerpt', 'featured_image', 'featured_image_tag', 'category', 'tags', 'is_published')
-    }),
-)
+        ('Basic info', {
+            'fields': (
+                'title',
+                'slug',
+                'author',
+                'excerpt',
+                'category',
+                'tags',
+            )
+        }),
+        ('Content (Tiptap)', {
+            'fields': (
+                'content_json',
+                'html_preview',
+            )
+        }),
+        ('Publish', {
+            'fields': (
+                'status',
+                'is_published',
+            )
+        }),
+        ('Meta', {
+            'fields': (
+                'odoo_version',
+                'module',
+                'error_keyword',
+            )
+        }),
+        ('System', {
+            'fields': (
+                'created_at',
+                'updated_at',
+            )
+        }),
+    )
 
-    def featured_image_tag(self, obj):
-        if obj.featured_image:
-            return format_html('<img src="{}" width="100" height="60" style="object-fit: cover; border-radius: 4px;" />', obj.featured_image.url)
-        return "No Image"
-    featured_image_tag.short_description = 'Ảnh đại diện'
+    def html_preview(self, obj):
+        if not obj.html_content:
+            return "-"
+        return format_html(
+            '<div style="max-width:800px; border:1px solid #ddd; padding:12px;">{}</div>',
+            obj.html_content
+        )
+
+    html_preview.short_description = "Content Preview (HTML)"

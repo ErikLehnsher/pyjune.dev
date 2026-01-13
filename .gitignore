@@ -1,4 +1,13 @@
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env.*
+*.pem
+
+# ========================
 # Python
+# ========================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -8,17 +17,27 @@ venv/
 env/
 ENV/
 
+# ========================
 # Django
+# ========================
 *.log
 local_settings.py
 db.sqlite3
 media/
+staticfiles/
 
-# Vue/Node
+# ========================
+# Node / Vue
+# ========================
 node_modules/
 dist/
 dist-ssr/
 *.local
+package-lock.json
 
-# VS Code
+# ========================
+# IDE / OS
+# ========================
 .vscode/
+.idea/
+.DS_Store
